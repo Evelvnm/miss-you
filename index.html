@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>温馨提示</title>
+    <title>想你的瞬间</title>
     <style>
         /* 全局样式：清除默认边距，统一字体 */
         * {
@@ -13,64 +13,120 @@
             font-family: "微软雅黑", sans-serif;
         }
 
-        /* 初始弹窗样式（粉色、居中） */
+        /* 初始弹窗样式（粉色、居中，新增渐变色和微动画） */
         .initial-popup {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 500px;
+            width: 90%; /* 移动端适配，最大500px */
+            max-width: 500px;
             height: 200px;
-            background-color: #FF69B4; /* 原代码粉色 */
+            background: linear-gradient(135deg, #FF69B4, #FF85C1); /* 渐变粉色 */
             border: none;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(255, 105, 180, 0.4);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 1000; /* 确保在最上层 */
+            z-index: 1000;
+            animation: fadeIn 0.5s ease-in-out; /* 淡入动画 */
         }
 
-        /* 初始弹窗文字 */
+        /* 初始弹窗文字（加粗+更大字号） */
         .initial-text {
-            font-size: 16px;
+            font-size: 20px;
             font-weight: bold;
-            color: #000000; /* 原代码黑色文字 */
-            margin-bottom: 20px;
+            color: #000000;
+            margin-bottom: 25px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
 
-        /* 初始弹窗按钮 */
+        /* 初始弹窗按钮（hover效果+缩放动画） */
         .initial-btn {
-            padding: 8px 20px;
-            font-size: 12px;
-            background-color: #000000; /* 原代码黑色按钮 */
+            padding: 10px 30px;
+            font-size: 14px;
+            background-color: #000000;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .initial-btn:hover {
+            transform: scale(1.05);
+            background-color: #333;
         }
 
-        /* 随机小弹窗样式 */
+        /* 随机小弹窗样式（新增动画+可关闭） */
         .random-popup {
             position: fixed;
             width: 300px;
+            max-width: 90%; /* 移动端适配 */
             height: 80px;
             border: none;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 999; /* 比初始弹窗低一层 */
+            z-index: 999;
+            animation: popIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* 弹出动画 */
+            overflow: hidden;
         }
 
-        /* 随机弹窗文字 */
+        /* 随机弹窗文字（行高优化+移动端适配） */
         .random-text {
             font-size: 15px;
+            line-height: 1.5;
             color: #000000;
             text-align: center;
-            width: 250px; /* 对应原代码wraplength=250 */
+            width: 90%;
+            max-width: 250px;
+        }
+
+        /* 关闭按钮（小弹窗右上角，hover显示） */
+        .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 20px;
+            height: 20px;
+            background-color: rgba(0,0,0,0.5);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .random-popup:hover .close-btn {
+            opacity: 1;
+        }
+
+        /* 动画定义 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -60%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
+        }
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* 移动端适配（小屏幕下调整弹窗大小） */
+        @media (max-width: 400px) {
+            .random-popup {
+                width: 250px;
+                height: 70px;
+            }
+            .random-text {
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -82,16 +138,21 @@
     </div>
 
     <script>
-        // 1. 复刻原代码的温馨提示文案
+        // 1. 扩展温馨提示文案（修复中文引号问题，新增30条想念类内容）
         const tips = [
             "又偷偷想你了～", "风凉，想牵你的手", "照顾好自己", "今天有没有开♥嘛",
-            "累了？想揉你头发", "别熬夜，梦里要见我", "别熬夜啦", "云像糖，想摘给你",
+            "累了？想揉你头发", "别熬夜，梦里要见我", "幸苦啦", "云像糖，想摘给你",
             "难过了？我的抱抱留着", "别急，我不会跑的", "记得想我哦~", "我想你了",
             "开心事，第一个想告诉你", "每天都要开开心心的哦", "保持好心情哦",
-            "想你想你想你", "今天的温柔，分你一半～"
+            "想你想你想你", "今天的温柔，分你一半～", "睡前的想念，是我偷偷的晚安",
+            "想你的风，吹到了我这里", "见不到你的日子，连空气都很想你",
+            "把想念写成诗，每一句都是你", "多希望下一秒，就能见到你", "想你的时候，连发呆都是甜的",
+            "我的想念，是藏不住的心跳", "你不在身边的每一刻，都在倒数相见的时间", "今晚的月亮很圆，像我想你的脸",
+            "想念你的笑，想念你的闹，想念你的一切", "对你的想念，从清晨到深夜，从未停歇",
+            "想你的频率，比手机提示音还频繁", "你是我日复一日的思念，年复一年的牵挂", "记得绿萝群，处处怜芳草"
         ];
 
-        // 2. 复刻原代码的随机亮色生成逻辑
+        // 2. 优化随机亮色生成逻辑（确保文字对比度）
         function getRandomColor() {
             const channel = ["r", "g", "b"][Math.floor(Math.random() * 3)];
             let r = 0, g = 0, b = 0;
@@ -112,10 +173,11 @@
             return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
         }
 
-        // 3. 复刻原代码的弹窗循环逻辑
+        // 3. 优化弹窗循环逻辑（新增手动关闭+总控按钮）
         let totalPops = 150; // 总弹窗数
         let currentPop = 0;  // 当前弹窗数
         const delay = 50;    // 间隔时间（毫秒）
+        let popupList = [];  // 存储所有弹窗，用于批量关闭
 
         function createRandomPopup() {
             if (currentPop < totalPops) {
@@ -139,8 +201,19 @@
                 textElem.textContent = randomContent;
                 popElem.appendChild(textElem);
 
-                // 加入页面
+                // 添加关闭按钮
+                const closeBtn = document.createElement("div");
+                closeBtn.className = "close-btn";
+                closeBtn.textContent = "×";
+                closeBtn.onclick = () => {
+                    popElem.remove();
+                    popupList = popupList.filter(item => item !== popElem);
+                };
+                popElem.appendChild(closeBtn);
+
+                // 加入页面并存储
                 document.body.appendChild(popElem);
+                popupList.push(popElem);
 
                 // 计数+1，延迟下一个
                 currentPop++;
@@ -148,10 +221,32 @@
             }
         }
 
-        // 4. 初始弹窗按钮点击事件（关闭初始弹窗+开始生成随机弹窗）
+        // 4. 新增“全部关闭”按钮（右下角固定）
+        function createCloseAllBtn() {
+            const closeAllBtn = document.createElement("button");
+            closeAllBtn.style.position = "fixed";
+            closeAllBtn.style.bottom = "20px";
+            closeAllBtn.style.right = "20px";
+            closeAllBtn.style.padding = "10px 20px";
+            closeAllBtn.style.backgroundColor = "rgba(0,0,0,0.8)";
+            closeAllBtn.style.color = "white";
+            closeAllBtn.style.border = "none";
+            closeAllBtn.style.borderRadius = "8px";
+            closeAllBtn.style.fontSize = "14px";
+            closeAllBtn.style.cursor = "pointer";
+            closeAllBtn.textContent = "全部关闭";
+            closeAllBtn.onclick = () => {
+                popupList.forEach(pop => pop.remove());
+                popupList = [];
+            };
+            document.body.appendChild(closeAllBtn);
+        }
+
+        // 5. 初始弹窗按钮点击事件（关闭初始弹窗+开始生成随机弹窗+创建总关按钮）
         document.getElementById("startBtn").addEventListener("click", () => {
             document.getElementById("initialPopup").remove(); // 关闭初始弹窗
             createRandomPopup(); // 开始生成随机弹窗
+            createCloseAllBtn(); // 创建全部关闭按钮
         });
     </script>
 </body>

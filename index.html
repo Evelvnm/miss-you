@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>温馨提示</title>
+    <style>
+        /* 全局样式：清除默认边距，统一字体 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "微软雅黑", sans-serif;
+        }
+
+        /* 初始弹窗样式（粉色、居中） */
+        .initial-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            height: 200px;
+            background-color: #FF69B4; /* 原代码粉色 */
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000; /* 确保在最上层 */
+        }
+
+        /* 初始弹窗文字 */
+        .initial-text {
+            font-size: 16px;
+            font-weight: bold;
+            color: #000000; /* 原代码黑色文字 */
+            margin-bottom: 20px;
+        }
+
+        /* 初始弹窗按钮 */
+        .initial-btn {
+            padding: 8px 20px;
+            font-size: 12px;
+            background-color: #000000; /* 原代码黑色按钮 */
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* 随机小弹窗样式 */
+        .random-popup {
+            position: fixed;
+            width: 300px;
+            height: 80px;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999; /* 比初始弹窗低一层 */
+        }
+
+        /* 随机弹窗文字 */
+        .random-text {
+            font-size: 15px;
+            color: #000000;
+            text-align: center;
+            width: 250px; /* 对应原代码wraplength=250 */
+        }
+    </style>
+</head>
+<body>
+    <!-- 初始弹窗（默认显示） -->
+    <div class="initial-popup" id="initialPopup">
+        <div class="initial-text">我想你啦～</div>
+        <button class="initial-btn" id="startBtn">知道啦</button>
+    </div>
+
+    <script>
+        // 1. 复刻原代码的温馨提示文案
+        const tips = [
+            "又偷偷想你了～", "风凉，想牵你的手", "照顾好自己", "今天有没有开♥嘛",
+            "累了？想揉你头发", "别熬夜，梦里要见我", "别熬夜啦", "云像糖，想摘给你",
+            "难过了？我的抱抱留着", "别急，我不会跑的", "记得想我哦~", "我想你了",
+            "开心事，第一个想告诉你", "每天都要开开心心的哦", "保持好心情哦",
+            "想你想你想你", "今天的温柔，分你一半～"
+        ];
+
+        // 2. 复刻原代码的随机亮色生成逻辑
+        function getRandomColor() {
+            const channel = ["r", "g", "b"][Math.floor(Math.random() * 3)];
+            let r = 0, g = 0, b = 0;
+            if (channel === "r") {
+                r = Math.floor(Math.random() * 36) + 220; // 220-255
+                g = Math.floor(Math.random() * 101) + 50; // 50-150
+                b = Math.floor(Math.random() * 101) + 50;
+            } else if (channel === "g") {
+                r = Math.floor(Math.random() * 101) + 50;
+                g = Math.floor(Math.random() * 36) + 220;
+                b = Math.floor(Math.random() * 101) + 50;
+            } else {
+                r = Math.floor(Math.random() * 101) + 50;
+                g = Math.floor(Math.random() * 101) + 50;
+                b = Math.floor(Math.random() * 36) + 220;
+            }
+            // 转16进制（补0）
+            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+        }
+
+        // 3. 复刻原代码的弹窗循环逻辑
+        let totalPops = 150; // 总弹窗数
+        let currentPop = 0;  // 当前弹窗数
+        const delay = 50;    // 间隔时间（毫秒）
+
+        function createRandomPopup() {
+            if (currentPop < totalPops) {
+                // 随机文案、颜色、位置
+                const randomContent = tips[Math.floor(Math.random() * tips.length)];
+                const randomBg = getRandomColor();
+                // 计算随机位置（避免弹窗超出屏幕）
+                const x = Math.floor(Math.random() * (window.innerWidth - 300));
+                const y = Math.floor(Math.random() * (window.innerHeight - 80));
+
+                // 创建弹窗元素
+                const popElem = document.createElement("div");
+                popElem.className = "random-popup";
+                popElem.style.backgroundColor = randomBg;
+                popElem.style.left = `${x}px`;
+                popElem.style.top = `${y}px`;
+
+                // 添加文字
+                const textElem = document.createElement("div");
+                textElem.className = "random-text";
+                textElem.textContent = randomContent;
+                popElem.appendChild(textElem);
+
+                // 加入页面
+                document.body.appendChild(popElem);
+
+                // 计数+1，延迟下一个
+                currentPop++;
+                setTimeout(createRandomPopup, delay);
+            }
+        }
+
+        // 4. 初始弹窗按钮点击事件（关闭初始弹窗+开始生成随机弹窗）
+        document.getElementById("startBtn").addEventListener("click", () => {
+            document.getElementById("initialPopup").remove(); // 关闭初始弹窗
+            createRandomPopup(); // 开始生成随机弹窗
+        });
+    </script>
+</body>
+</html>

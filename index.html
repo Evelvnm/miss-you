@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>想你的瞬间</title>
+    <title>立冬想你</title>
     <style>
         /* 全局样式：清除默认边距，统一字体 */
         * {
@@ -13,16 +14,26 @@
             font-family: "微软雅黑", sans-serif;
         }
 
-        /* 初始弹窗样式（粉色、居中，新增渐变色和微动画） */
+        /* 背景图样式（完整显示，居中对齐） */
+        body {
+            background-image: url('love.jpg'); 
+            background-size: contain;
+            background-position: center center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+        }
+
+        /* 初始弹窗样式 */
         .initial-popup {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 90%; /* 移动端适配，最大500px */
+            width: 90%;
             max-width: 500px;
             height: 200px;
-            background: linear-gradient(135deg, #FF69B4, #FF85C1); /* 渐变粉色 */
+            background: linear-gradient(135deg, #FF69B4, #FF85C1);
             border: none;
             border-radius: 12px;
             box-shadow: 0 8px 30px rgba(255, 105, 180, 0.4);
@@ -31,10 +42,9 @@
             align-items: center;
             justify-content: center;
             z-index: 1000;
-            animation: fadeIn 0.5s ease-in-out; /* 淡入动画 */
+            animation: fadeIn 0.5s ease-in-out;
         }
 
-        /* 初始弹窗文字（加粗+更大字号） */
         .initial-text {
             font-size: 20px;
             font-weight: bold;
@@ -43,7 +53,6 @@
             text-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
 
-        /* 初始弹窗按钮（hover效果+缩放动画） */
         .initial-btn {
             padding: 10px 30px;
             font-size: 14px;
@@ -59,41 +68,41 @@
             background-color: #333;
         }
 
-        /* 随机小弹窗样式（新增动画+可关闭） */
+        /* 随机小弹窗样式 */
         .random-popup {
             position: fixed;
-            width: 300px;
-            max-width: 90%; /* 移动端适配 */
-            height: 80px;
+            width: 280px;
+            max-width: 90%;
+            height: 70px;
             border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            border-radius: 15px;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.18);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 999;
-            animation: popIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* 弹出动画 */
+            animation: popIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             overflow: hidden;
+            transition: all 1.5s ease-in-out;
         }
 
-        /* 随机弹窗文字（行高优化+移动端适配） */
         .random-text {
-            font-size: 15px;
-            line-height: 1.5;
+            font-size: 14px;
+            line-height: 1.6;
             color: #000000;
             text-align: center;
             width: 90%;
-            max-width: 250px;
+            max-width: 240px;
         }
 
-        /* 关闭按钮（小弹窗右上角，hover显示） */
+        /* 浮窗关闭按钮（颜色调浅） */
         .close-btn {
             position: absolute;
             top: 5px;
             right: 5px;
             width: 20px;
             height: 20px;
-            background-color: rgba(0,0,0,0.5);
+            background-color: rgba(0,0,0,0.3); /* 透明度从0.5降为0.3，颜色更浅 */
             color: white;
             border-radius: 50%;
             display: flex;
@@ -118,47 +127,86 @@
             to { transform: scale(1); opacity: 1; }
         }
 
-        /* 移动端适配（小屏幕下调整弹窗大小） */
+        /* 移动端适配 */
         @media (max-width: 400px) {
             .random-popup {
-                width: 250px;
-                height: 70px;
+                width: 240px;
+                height: 60px;
             }
             .random-text {
-                font-size: 14px;
+                font-size: 13px;
             }
+        }
+
+        /* 音乐控制按钮 */
+        .music-control {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
         }
     </style>
 </head>
 <body>
-    <!-- 初始弹窗（默认显示） -->
+    <!-- 背景音乐 -->
+    <audio id="bgMusic" loop>
+        <source src="恶作剧.aac" type="audio/aac">
+    </audio>
+
+    <!-- 音乐控制按钮 -->
+    <div class="music-control" id="musicControl">
+        ▶
+    </div>
+
+    <!-- 初始弹窗 -->
     <div class="initial-popup" id="initialPopup">
-        <div class="initial-text">我想你啦～</div>
+        <div class="initial-text">立冬快乐呀～</div>
         <button class="initial-btn" id="startBtn">知道啦</button>
     </div>
 
     <script>
-        // 1. 扩展温馨提示文案（修复中文引号问题，新增30条想念类内容）
+        // 立冬专属文案
         const tips = [
-            "又偷偷想你了～", "风凉，想牵你的手", "照顾好自己", "今天有没有开♥嘛",
-            "累了？想揉你头发", "别熬夜，梦里要见我", "幸苦啦", "云像糖，想摘给你",
-            "难过了？我的抱抱留着", "别急，我不会跑的", "记得想我哦~", "我想你了",
-            "开心事，第一个想告诉你", "每天都要开开心心的哦", "保持好心情哦",
-            "想你想你想你", "今天的温柔，分你一半～", "睡前的想念，是我偷偷的晚安",
-            "想你的风，吹到了我这里", "见不到你的日子，连空气都很想你",
-            "把想念写成诗，每一句都是你", "多希望下一秒，就能见到你", "想你的时候，连发呆都是甜的",
-            "我的想念，是藏不住的心跳", "你不在身边的每一刻，都在倒数相见的时间", "今晚的月亮很圆，像我想你的脸",
-            "想念你的笑，想念你的闹，想念你的一切", "对你的想念，从清晨到深夜，从未停歇",
-            "想你的频率，比手机提示音还频繁", "你是我日复一日的思念，年复一年的牵挂", "记得绿萝群，处处怜芳草"
+            "立冬快乐",
+            "岁至立冬",
+            "天冷了，多穿衣服（可能你们那边没那么冷哈）",
+            "冬日如愿，科二必过",
+            "按时吃饭，多多喝水，好好想我",
+            "保持微笑呀",
+            "每天都要元气满满呀",
+            "愿你的冬天，天不寒日日暖，暖在心中",
+            "寒来暑往，秋收冬藏",
+            "保持好心情，我一直在",
+            "好好照顾自己，要不然我真的会心疼",
+            "我想你了，超级超级超级想",
+            "期待和你下一次见面",
+            "所有美好也如期而至",
+            "别太累啦，偶尔偷懒也好，我一直在哦",
+            "你是最最最最最最最最棒的",
+            "珍惜和你每一刻",
+            "顺顺利利",
+            "立冬快乐",
+            "愿所有烦恼都消失",
+            "你超级美，超级好看，超级可爱",
+            "今天过得开心嘛"
         ];
 
-        // 2. 优化随机亮色生成逻辑（确保文字对比度）
+        // 随机亮色生成逻辑（修改为带透明度的rgba格式）
         function getRandomColor() {
             const channel = ["r", "g", "b"][Math.floor(Math.random() * 3)];
             let r = 0, g = 0, b = 0;
             if (channel === "r") {
-                r = Math.floor(Math.random() * 36) + 220; // 220-255
-                g = Math.floor(Math.random() * 101) + 50; // 50-150
+                r = Math.floor(Math.random() * 36) + 220;
+                g = Math.floor(Math.random() * 101) + 50;
                 b = Math.floor(Math.random() * 101) + 50;
             } else if (channel === "g") {
                 r = Math.floor(Math.random() * 101) + 50;
@@ -169,39 +217,57 @@
                 g = Math.floor(Math.random() * 101) + 50;
                 b = Math.floor(Math.random() * 36) + 220;
             }
-            // 转16进制（补0）
-            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+            // 最后一个参数0.7为透明度（0-1之间，值越小越透明），可根据需求调整
+            return `rgba(${r}, ${g}, ${b}, 0.7)`;
         }
 
-        // 3. 优化弹窗循环逻辑（新增手动关闭+总控按钮）
-        let totalPops = 150; // 总弹窗数
-        let currentPop = 0;  // 当前弹窗数
-        const delay = 50;    // 间隔时间（毫秒）
-        let popupList = [];  // 存储所有弹窗，用于批量关闭
+        // 生成爱心形状的坐标点（优化居中与对称）
+        function getHeartPosition(index, total, scale = 1) {
+            const t = (index / total) * Math.PI * 2;
+            const x = 16 * Math.pow(Math.sin(t), 3);
+            const y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+            
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            
+            // 调整缩放和偏移，确保爱心居中且对称
+            const scaleFactor = Math.min(window.innerWidth, window.innerHeight) / 32 * scale;
+            const offsetX = (Math.random() - 0.5) * 15;
+            const offsetY = (Math.random() - 0.5) * 15;
+            
+            return {
+                x: centerX + x * scaleFactor + offsetX,
+                y: centerY - y * scaleFactor + offsetY
+            };
+        }
+
+        // 弹窗逻辑（调整弹出速度）
+        let totalPops = 120; 
+        let currentPop = 0;
+        let delay = 100; // 弹窗弹出速度适中
+        let popupList = [];
+        let isHeartFormed = false;
 
         function createRandomPopup() {
             if (currentPop < totalPops) {
-                // 随机文案、颜色、位置
                 const randomContent = tips[Math.floor(Math.random() * tips.length)];
                 const randomBg = getRandomColor();
-                // 计算随机位置（避免弹窗超出屏幕）
-                const x = Math.floor(Math.random() * (window.innerWidth - 300));
-                const y = Math.floor(Math.random() * (window.innerHeight - 80));
+                
+                const randomX = Math.floor(Math.random() * (window.innerWidth - 280));
+                const randomY = Math.floor(Math.random() * (window.innerHeight - 70));
 
-                // 创建弹窗元素
                 const popElem = document.createElement("div");
                 popElem.className = "random-popup";
                 popElem.style.backgroundColor = randomBg;
-                popElem.style.left = `${x}px`;
-                popElem.style.top = `${y}px`;
+                popElem.style.left = `${randomX}px`;
+                popElem.style.top = `${randomY}px`;
+                popElem.dataset.index = currentPop;
 
-                // 添加文字
                 const textElem = document.createElement("div");
                 textElem.className = "random-text";
                 textElem.textContent = randomContent;
                 popElem.appendChild(textElem);
 
-                // 添加关闭按钮
                 const closeBtn = document.createElement("div");
                 closeBtn.className = "close-btn";
                 closeBtn.textContent = "×";
@@ -211,17 +277,35 @@
                 };
                 popElem.appendChild(closeBtn);
 
-                // 加入页面并存储
                 document.body.appendChild(popElem);
                 popupList.push(popElem);
 
-                // 计数+1，延迟下一个
                 currentPop++;
                 setTimeout(createRandomPopup, delay);
+                
+                if (currentPop === totalPops) {
+                    setTimeout(formHeartShape, 1000);
+                }
             }
         }
 
-        // 4. 新增“全部关闭”按钮（右下角固定）
+        // 组成爱心形状
+        function formHeartShape() {
+            isHeartFormed = true;
+            popupList.forEach((pop, index) => {
+                const heartPos = getHeartPosition(index, popupList.length, 0.9);
+                
+                const maxX = window.innerWidth - pop.offsetWidth;
+                const maxY = window.innerHeight - pop.offsetHeight;
+                const finalX = Math.max(0, Math.min(heartPos.x, maxX));
+                const finalY = Math.max(0, Math.min(heartPos.y, maxY));
+                
+                pop.style.left = `${finalX}px`;
+                pop.style.top = `${finalY}px`;
+            });
+        }
+
+        // 全部关闭按钮
         function createCloseAllBtn() {
             const closeAllBtn = document.createElement("button");
             closeAllBtn.style.position = "fixed";
@@ -242,11 +326,42 @@
             document.body.appendChild(closeAllBtn);
         }
 
-        // 5. 初始弹窗按钮点击事件（关闭初始弹窗+开始生成随机弹窗+创建总关按钮）
+        // 音乐控制
+        const music = document.getElementById('bgMusic');
+        const musicControl = document.getElementById('musicControl');
+        
+        musicControl.addEventListener('click', () => {
+            if (music.paused) {
+                music.play().catch(e => {
+                    console.log('播放失败:', e);
+                    alert('请点击页面任意位置以允许播放音乐');
+                });
+                musicControl.textContent = "⏸";
+            } else {
+                music.pause();
+                musicControl.textContent = "▶";
+            }
+        });
+
+        document.body.addEventListener('click', () => {
+            if (music.paused) {
+                music.play().catch(e => console.log('自动播放失败，需要用户交互'));
+            }
+        }, { once: true });
+
+        // 窗口大小改变时重排爱心
+        window.addEventListener('resize', () => {
+            if (isHeartFormed) {
+                formHeartShape();
+            }
+        });
+
+        // 初始弹窗点击事件
         document.getElementById("startBtn").addEventListener("click", () => {
-            document.getElementById("initialPopup").remove(); // 关闭初始弹窗
-            createRandomPopup(); // 开始生成随机弹窗
-            createCloseAllBtn(); // 创建全部关闭按钮
+            document.getElementById("initialPopup").remove();
+            createRandomPopup();
+            createCloseAllBtn();
+            music.play().catch(e => console.log('需要用户交互才能播放音乐'));
         });
     </script>
 </body>
